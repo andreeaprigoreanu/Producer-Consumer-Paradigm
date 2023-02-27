@@ -1,0 +1,41 @@
+Andreea Prigoreanu
+331CA
+                                Tema 1 APD
+                            Paradigma Map-Reduce
+
+Rezolvarea temei este structurata in urmatoarele fisiere:
+    - helpers.h si helpers.cpp: contin functii ajutatoare
+    - map_reduce.h si map_reduce.cpp: contin functiile si structurile pasate
+ ca argumente catre threadurile mapper si reducer
+    - main.cpp: procesul coordonator care lanseaza procesele de tip mapper si
+ reducer
+
+Logica in main:
+    - se extrag num_mappers, num_reducers si numele fisierului de intrare
+ principal din argumentele date in linia de comanda
+    - se parcurg numele fisierelor de prelucrat si se introduc intr-un
+ priority_queue in functie de dimensiune
+    - se initializeaza structurile pasate ca argumente catre threaduri
+    - se creeaza threadurile
+    - se da join threadurilor
+
+Logica in mappers:
+    - fiecare mapper primeste in structura cu argumente priority_queue-ul
+ cu fisiere si extrage fisiere din el cat timp mai exista fisiere neprocesate
+    - fiecare mapper are un set ce cotine listele partiale rezultate din
+ analiza fisierelor asignate lui
+    - cand se termina de procesat toate fisierele, listele partiale se adauga
+ intr-un vector ce va fi dat mai departe catre reducers
+    - se folosesc mutecsi la scoaterea fisierelor din coada si la adaugarea
+ rezultatelor procesarii in vector pentru a evita race condition
+    - pentru a se asigura faptul ca reducers incep dupa terminarea mappers,
+ inainte de a iesi din mappers se pune o bariera
+
+ Logica pentru reducers:
+    - pentru a se asigura faptul ca reducers incep dupa terminarea mappers,
+ inainte de a inceperea actiunilor in reducers se pune o bariera
+    - fiecare reducer primeste in structura cu argumente exponentul de care se
+ ocupa
+    - trece prin vectorul cu rezulatele de la mappers si retine intr-un set
+ puterile perfecte diferite
+    - la final, scrie numarul puterilor perfecte in fisierul de out
